@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: cache
+    app.kubernetes.io/part-of: talkyard
+    app.kubernetes.io/version: v0.2021.01-923ae76d3
+  name: cache
+  namespace: talkyard
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: cache
+  template:
+    metadata:
+      labels:
+        name: cache
+    spec:
+      containers:
+      - image: debiki/talkyard-cache:v0.2021.01-923ae76d3
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 3
+          tcpSocket:
+            port: cache
+          timeoutSeconds: 5
+        name: cache
+        ports:
+        - containerPort: 6379
+          name: cache
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 20
+          periodSeconds: 3
+          timeoutSeconds: 5

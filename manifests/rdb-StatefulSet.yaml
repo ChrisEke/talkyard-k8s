@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: talkyard
+    app.kubernetes.io/version: v0.2021.01-923ae76d3
+  name: rdb
+  namespace: talkyard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: rdb
+  serviceName: rdb
+  template:
+    metadata:
+      annotations:
+        rdb-init-sh-override-hash: 7c3cde4a1adfa2344a4bbab371fafcce
+      labels:
+        name: rdb
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgres-password
+              name: talkyard-rdb-secret
+        image: debiki/talkyard-rdb:v0.2021.01-923ae76d3
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 6
+        name: rdb
+        ports:
+        - containerPort: 5432
+          name: rdb
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 6
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: rdb-init-sh-override
+      volumes:
+      - configMap:
+          name: rdb-init-sh-override
+        name: rdb-init-sh-override
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - {}

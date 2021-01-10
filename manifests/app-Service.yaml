@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: app
+  name: app
+  namespace: talkyard
+spec:
+  ports:
+  - name: app-http
+    port: 9000
+    targetPort: 9000
+  selector:
+    name: app
