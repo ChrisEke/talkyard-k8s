@@ -6,7 +6,6 @@ resources:
 - app-Service.yaml
 - cache-Deployment.yaml
 - cache-Service.yaml
-- kustomization.yaml
 - rdb-init-sh-override-ConfigMap.yaml
 - rdb-Service.yaml
 - rdb-StatefulSet.yaml

@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
-#rm -r manifests/ 
-#tk export environments/default ./manifests --format='{{.metadata.name}}-{{.kind}}'
+manifest_dir="manifests"
+kustomize_base="kustomization.yaml"
+kustomize_manifests="$manifest_dir/$kustomize_base"
 
-file1="manifests/kustomization.yaml"
-file2="kustomization.yaml"
+rm -r $manifest_dir/ 
+tk export environments/default $manifest_dir --format='{{.metadata.name}}-{{.kind}}'
 
-echo "apiVersion: kustomize.config.k8s.io/v1beta1" | tee $file1 $file2 > /dev/null
-echo "kind: Kustomization" | tee -a $file1 $file2 > /dev/null
-echo "resources:" | tee -a $file1 $file2 > /dev/null
+echo "apiVersion: kustomize.config.k8s.io/v1beta1" | tee $kustomize_base $kustomize_manifests > /dev/null
+echo "kind: Kustomization" | tee -a $kustomize_base $kustomize_manifests > /dev/null
+echo "resources:" | tee -a $kustomize_base $kustomize_manifests > /dev/null
 
 # use nullglob in case there are no matching files
 shopt -s nullglob
-# create an array with all the filer/dir inside ~/myDir
-files=(manifests/*)
+# create an array with all the files inside dir ./manifests
+manifest_files=($manifest_dir/*)
 
-for f in "${files[@]}"; do
+for f in "${manifest_files[@]}"; do
     f=$(basename $f)
-    echo "- $f" | tee -a $file1 > /dev/null
+    if [ ! $f == "kustomization.yaml" ]; then
+        echo "- $f" | tee -a $kustomize_manifests > /dev/null
+    fi
 done
 
-echo "- manifests" | tee -a $file2 > /dev/null
+echo "- $manifest_dir" | tee -a $kustomize_base > /dev/null
