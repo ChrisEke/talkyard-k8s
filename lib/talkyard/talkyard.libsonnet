@@ -34,9 +34,9 @@
                     ],
                   )
                   + deployment.mixin.metadata.withLabels(c.commonLabels + c.app.labels)
-                  + $.util.configMapVolumeMount(self.playFrameworkConf, '/opt/talkyard/app/conf/app-prod-override.conf', volumeMount.withSubPath('app-prod-override.conf')),
+                  + $.util.configMapVolumeMount(self.playFrameworkConfigMap, '/opt/talkyard/app/conf/app-prod-override.conf', volumeMount.withSubPath('app-prod-override.conf')),
       service: $.util.serviceFor(self.deployment),
-      playFrameworkConf: configMap.new(c.app.name + '-play-framework-conf')
+      playFrameworkConfigMap: configMap.new(c.app.name + '-play-framework-conf')
                          + configMap.withData({
                            'app-prod-override.conf': importstr 'files/play-framework.conf',
                          }),
@@ -70,9 +70,9 @@
                    )
                    + statefulSet.mixin.metadata.withLabels(c.commonLabels + c.rdb.labels)
                    + statefulSet.mixin.spec.withServiceName(c.rdb.name)
-                   + $.util.configMapVolumeMount(self.initShOverride, '/docker-entrypoint-initdb.d'),
+                   + $.util.configMapVolumeMount(self.initShOverrideConfigMap, '/docker-entrypoint-initdb.d'),
       service: $.util.serviceFor(self.statefulSet),
-      initShOverride: configMap.new(c.rdb.name + '-init-sh-override')
+      initShOverrideConfigMap: configMap.new(c.rdb.name + '-init-sh-override')
                       + configMap.withData({
                         'init.sh': importstr 'files/init.sh',
                       }),
