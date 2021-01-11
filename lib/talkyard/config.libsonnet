@@ -5,6 +5,9 @@
     // define a namespace for this library
     talkyard: {
       name: 'talkyard',
+      namespace: {
+        name: 'talkyard',
+      },
       commonLabels: {
         'app.kubernetes.io/part-of': 'talkyard',
         'app.kubernetes.io/version': $._version.talkyard.version,
@@ -15,8 +18,7 @@
           'app.kubernetes.io/component': 'application',
         },
         ports: [
-          { name: 'http', port: 7000 },
-          { name: 'https', port: 9000 },
+          { name: 'http', port: 9000 },
         ],
         env: {},
       },
@@ -46,10 +48,7 @@
         ports: [
           { name: 'default', port: 9300 },
         ],
-        env: {
-          ES_JAVA_OPTS: '-Xms192m -Xmx192m',
-          'bootstrap.memory_lock': 'true',
-        },
+        env: {},
       },
       web: {
         name: 'web',
@@ -58,7 +57,6 @@
         },
         ports: [
           { name: 'http', port: 80 },
-          { name: 'https', port: 443 },
         ],
       },
     },

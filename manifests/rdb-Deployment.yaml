@@ -27,7 +27,7 @@ spec:
           valueFrom:
             secretKeyRef:
               key: postgres-password
-              name: talkyard-rdb-secret
+              name: talkyard-rdb-secrets
         image: debiki/talkyard-rdb:v0.2021.01-923ae76d3
         imagePullPolicy: IfNotPresent
         livenessProbe:

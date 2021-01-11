@@ -27,12 +27,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: postgres-password
-              name: talkyard-rdb-secret
+              name: talkyard-rdb-secrets
         - name: PLAY_SECRET_KEY
           valueFrom:
             secretKeyRef:
               key: play-secret-key
-              name: talkyard-app-secret
+              name: talkyard-app-secrets
         envFrom:
         - configMapRef:
             name: app-environment-var
@@ -46,10 +46,8 @@ spec:
           timeoutSeconds: 5
         name: app
         ports:
-        - containerPort: 7000
-          name: http
         - containerPort: 9000
-          name: https
+          name: http
         readinessProbe:
           httpGet:
             path: /-/are-scripts-ready

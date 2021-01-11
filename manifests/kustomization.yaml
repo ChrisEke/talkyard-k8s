@@ -14,5 +14,6 @@ resources:
 - search-environment-vars-ConfigMap.yaml
 - search-log4j2-properties-override-ConfigMap.yaml
 - search-Service.yaml
+- talkyard-Namespace.yaml
 - web-Deployment.yaml
 - web-Service.yaml
