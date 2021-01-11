@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/part-of: talkyard
     app.kubernetes.io/version: v0.2021.01-923ae76d3
   name: cache
-  namespace: talkyard
+  namespace: talkyard-test
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -31,7 +31,7 @@ spec:
         name: cache
         ports:
         - containerPort: 6379
-          name: cache
+          name: default
         readinessProbe:
           exec:
             command:

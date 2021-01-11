@@ -11,7 +11,7 @@
   local persistentVolumeClaim = $.core.v1.persistentVolumeClaim,
 
   local c = $._config.talkyard,
- talkyard: {
+  talkyard: {
     app: {
       deployment: deployment.new(
                     name=c.app.name,
@@ -46,19 +46,23 @@
                      name=c.rdb.name,
                      replicas=1,
                      volumeClaims=[
-                       persistentVolumeClaim.new()
+                       persistentVolumeClaim.new(),
                      ],
                      containers=[
                        container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version.talkyard.version)
-                       + container.withPorts([port.new('rdb', 5432)])
+                       + container.withPorts([port.new(c.rdb.ports.default.name, c.rdb.ports.default.port)])
                        + container.withEnv([
                          container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secret', 'postgres-password'),
                        ])
-                       + container.mixin.readinessProbe.exec.withCommand(['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432'],)
+                       + container.mixin.readinessProbe.exec.withCommand(
+                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432']
+                       )
                        + container.mixin.readinessProbe.withInitialDelaySeconds(10)
                        + container.mixin.readinessProbe.withTimeoutSeconds(6)
                        + container.mixin.readinessProbe.withPeriodSeconds(30)
-                       + container.mixin.livenessProbe.exec.withCommand(['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432'],)
+                       + container.mixin.livenessProbe.exec.withCommand(
+                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432']
+                       )
                        + container.mixin.livenessProbe.withInitialDelaySeconds(30)
                        + container.mixin.livenessProbe.withPeriodSeconds(30)
                        + container.mixin.livenessProbe.withTimeoutSeconds(6),
@@ -79,7 +83,7 @@
                     replicas=1,
                     containers=[
                       container.new(c.cache.name, $._images.talkyard.cache + ':' + $._version.talkyard.version)
-                      + container.withPorts([port.new('cache', 6379)])
+                      + container.withPorts([port.new(c.cache.ports.default.name, c.cache.ports.default.port)])
                       + container.mixin.readinessProbe.exec.withCommand(['redis-cli', 'ping'],)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(20)
                       + container.mixin.readinessProbe.withTimeoutSeconds(5)
@@ -100,7 +104,7 @@
                     replicas=1,
                     containers=[
                       container.new(c.search.name, $._images.talkyard.search + ':' + $._version.talkyard.version)
-                      + container.withPorts([port.new('search', 9300)])
+                      + container.withPorts([port.new(c.search.ports.default.name, c.search.ports.default.port)])
                       + container.withEnvMap(c.search.env)
                       + container.mixin.readinessProbe.exec.withCommand(['/bin/sh', '-c', importstr 'files/elastisearch-readiness.sh'],)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(30)
@@ -111,8 +115,11 @@
                   )
                   + deployment.mixin.metadata.withLabels(c.commonLabels + c.search.labels)
 
-                  + $.util.configMapVolumeMount(self.log4j2PropertiesOverride, '/usr/share/elasticsearch/config/log4j2.properties', volumeMount.withSubPath('log4j2.properties')),
-
+                  + $.util.configMapVolumeMount(
+                    self.log4j2PropertiesOverride,
+                    '/usr/share/elasticsearch/config/log4j2.properties',
+                    volumeMount.withSubPath('log4j2.properties')
+                  ),
       service: $.util.serviceFor(self.deployment),
       log4j2PropertiesOverride: configMap.new(c.search.name + '-log4j2-properties-override')
                                 + configMap.withData({
@@ -125,7 +132,12 @@
                     replicas=1,
                     containers=[
                       container.new(c.web.name, $._images.talkyard.web + ':' + $._version.talkyard.version)
-                      + container.withPorts([port.new('http', 80)])
+                      + container.withPorts(
+                        [
+                          port.new(c.web.ports.http.name, c.web.ports.http.port),
+                          port.new(c.web.ports.https.name, c.web.ports.https.port),
+                        ]
+                      )
                       + container.mixin.readinessProbe.httpGet.withPath('/-/ping-nginx')
                       + container.mixin.readinessProbe.httpGet.withPort('http')
                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
@@ -134,7 +146,6 @@
                   )
                   + deployment.mixin.metadata.withLabels(c.commonLabels + c.web.labels),
       service: $.util.serviceFor(self.deployment),
-
     },
   },
 }

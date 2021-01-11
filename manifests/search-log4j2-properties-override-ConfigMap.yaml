@@ -25,4 +25,4 @@ data:
 kind: ConfigMap
 metadata:
   name: search-log4j2-properties-override
-  namespace: talkyard
+  namespace: talkyard-test

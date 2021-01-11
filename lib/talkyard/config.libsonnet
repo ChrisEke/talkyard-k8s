@@ -19,10 +19,15 @@
         },
       },
       rdb: {
-        port: 9090,
         name: 'rdb',
         labels: {
           'app.kubernetes.io/component': 'database',
+        },
+        ports: {
+          default: {
+            name: 'default',
+            port: 5432,
+          },
         },
       },
       cache: {
@@ -30,14 +35,24 @@
         labels: {
           'app.kubernetes.io/component': 'cache',
         },
-        port: 9090,
+        ports: {
+          default: {
+            name: 'default',
+            port: 6379,
+          },
+        },
       },
       search: {
         name: 'search',
         labels: {
           'app.kubernetes.io/component': 'search',
         },
-        port: 9090,
+        ports: {
+          default: {
+            name: 'default',
+            port: 9300,
+          },
+        },
         env: {
           ES_JAVA_OPTS: '-Xms192m -Xmx192m',
           'bootstrap.memory_lock': 'true',
@@ -48,7 +63,16 @@
         labels: {
           'app.kubernetes.io/component': 'webserver',
         },
-        port: 9090,
+        ports: {
+          http: {
+            name: 'http',
+            port: 80,
+          },
+          https: {
+            name: 'https',
+            port: 443,
+          },
+        },
       },
     },
   },

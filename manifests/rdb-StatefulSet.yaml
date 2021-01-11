@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/part-of: talkyard
     app.kubernetes.io/version: v0.2021.01-923ae76d3
   name: rdb
-  namespace: talkyard
+  namespace: talkyard-test
 spec:
   replicas: 1
   selector:
@@ -41,7 +41,7 @@ spec:
         name: rdb
         ports:
         - containerPort: 5432
-          name: rdb
+          name: default
         readinessProbe:
           exec:
             command:

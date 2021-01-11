@@ -4,7 +4,7 @@ metadata:
   labels:
     name: app
   name: app
-  namespace: talkyard
+  namespace: talkyard-test
 spec:
   ports:
   - name: app-http

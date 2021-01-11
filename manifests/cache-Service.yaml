@@ -4,10 +4,10 @@ metadata:
   labels:
     name: cache
   name: cache
-  namespace: talkyard
+  namespace: talkyard-test
 spec:
   ports:
-  - name: cache-cache
+  - name: cache-default
     port: 6379
     targetPort: 6379
   selector:

@@ -4,10 +4,10 @@ metadata:
   labels:
     name: search
   name: search
-  namespace: talkyard
+  namespace: talkyard-test
 spec:
   ports:
-  - name: search-search
+  - name: search-default
     port: 9300
     targetPort: 9300
   selector:

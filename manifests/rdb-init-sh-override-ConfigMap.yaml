@@ -143,4 +143,4 @@ data:
 kind: ConfigMap
 metadata:
   name: rdb-init-sh-override
-  namespace: talkyard
+  namespace: talkyard-test

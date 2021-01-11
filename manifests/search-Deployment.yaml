@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/part-of: talkyard
     app.kubernetes.io/version: v0.2021.01-923ae76d3
   name: search
-  namespace: talkyard
+  namespace: talkyard-test
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -32,7 +32,7 @@ spec:
         name: search
         ports:
         - containerPort: 9300
-          name: search
+          name: default
         readinessProbe:
           exec:
             command:

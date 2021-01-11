@@ -159,4 +159,4 @@ data:
 kind: ConfigMap
 metadata:
   name: app-play-framework-conf
-  namespace: talkyard
+  namespace: talkyard-test
