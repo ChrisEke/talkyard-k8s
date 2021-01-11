@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - app-Deployment.yaml
+- app-environment-var-ConfigMap.yaml
 - app-play-framework-conf-ConfigMap.yaml
 - app-Service.yaml
 - cache-Deployment.yaml
@@ -10,6 +11,7 @@ resources:
 - rdb-Service.yaml
 - rdb-StatefulSet.yaml
 - search-Deployment.yaml
+- search-environment-vars-ConfigMap.yaml
 - search-log4j2-properties-override-ConfigMap.yaml
 - search-Service.yaml
 - web-Deployment.yaml

@@ -11,6 +11,12 @@
   local persistentVolumeClaim = $.core.v1.persistentVolumeClaim,
 
   local c = $._config.talkyard,
+
+  local containerPorts(o) = [
+    { name: p.name, containerPort: p.port }
+    for p in o
+  ],
+
   talkyard: {
     app: {
       deployment: deployment.new(
@@ -18,12 +24,12 @@
                     replicas=1,
                     containers=[
                       container.new(c.app.name, $._images.talkyard.app + ':' + $._version.talkyard.version)
-                      + container.withPorts([port.new('http', 9000)])
+                      + container.withPorts(containerPorts(c.app.ports))
                       + container.withEnv([
                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secret', 'postgres-password'),
                         container.envType.fromSecretRef('PLAY_SECRET_KEY', 'talkyard-app-secret', 'play-secret-key'),
                       ])
-                      + container.withEnvMap(c.app.env)
+                      + container.withEnvFrom([container.envFromType.mixin.configMapRef.withName(self.envConfigMap.metadata.name)])
                       + container.mixin.readinessProbe.httpGet.withPath('/-/are-scripts-ready')
                       + container.mixin.readinessProbe.httpGet.withPort('http')
                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
@@ -37,9 +43,11 @@
                   + $.util.configMapVolumeMount(self.playFrameworkConfigMap, '/opt/talkyard/app/conf/app-prod-override.conf', volumeMount.withSubPath('app-prod-override.conf')),
       service: $.util.serviceFor(self.deployment),
       playFrameworkConfigMap: configMap.new(c.app.name + '-play-framework-conf')
-                         + configMap.withData({
-                           'app-prod-override.conf': importstr 'files/play-framework.conf',
-                         }),
+                              + configMap.withData({
+                                'app-prod-override.conf': importstr 'files/play-framework.conf',
+                              }),
+      envConfigMap: configMap.new(c.app.name + '-environment-var')
+                    + configMap.withData(c.app.env),
     },
     rdb: {
       statefulSet: statefulSet.new(
@@ -50,18 +58,18 @@
                      ],
                      containers=[
                        container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version.talkyard.version)
-                       + container.withPorts([port.new(c.rdb.ports.default.name, c.rdb.ports.default.port)])
+                       + container.withPorts(containerPorts(c.rdb.ports))
                        + container.withEnv([
                          container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secret', 'postgres-password'),
                        ])
                        + container.mixin.readinessProbe.exec.withCommand(
-                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432']
+                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
                        )
                        + container.mixin.readinessProbe.withInitialDelaySeconds(10)
                        + container.mixin.readinessProbe.withTimeoutSeconds(6)
                        + container.mixin.readinessProbe.withPeriodSeconds(30)
                        + container.mixin.livenessProbe.exec.withCommand(
-                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p 5432']
+                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
                        )
                        + container.mixin.livenessProbe.withInitialDelaySeconds(30)
                        + container.mixin.livenessProbe.withPeriodSeconds(30)
@@ -73,9 +81,9 @@
                    + $.util.configMapVolumeMount(self.initShOverrideConfigMap, '/docker-entrypoint-initdb.d'),
       service: $.util.serviceFor(self.statefulSet),
       initShOverrideConfigMap: configMap.new(c.rdb.name + '-init-sh-override')
-                      + configMap.withData({
-                        'init.sh': importstr 'files/init.sh',
-                      }),
+                               + configMap.withData({
+                                 'init.sh': importstr 'files/init.sh',
+                               }),
     },
     cache: {
       deployment: deployment.new(
@@ -83,12 +91,12 @@
                     replicas=1,
                     containers=[
                       container.new(c.cache.name, $._images.talkyard.cache + ':' + $._version.talkyard.version)
-                      + container.withPorts([port.new(c.cache.ports.default.name, c.cache.ports.default.port)])
+                      + container.withPorts(containerPorts(c.cache.ports))
                       + container.mixin.readinessProbe.exec.withCommand(['redis-cli', 'ping'],)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(20)
                       + container.mixin.readinessProbe.withTimeoutSeconds(5)
                       + container.mixin.readinessProbe.withPeriodSeconds(3)
-                      + container.mixin.livenessProbe.tcpSocket.withPort('cache')
+                      + container.mixin.livenessProbe.tcpSocket.withPort(c.cache.ports[0].name)
                       + container.mixin.livenessProbe.withInitialDelaySeconds(20)
                       + container.mixin.livenessProbe.withPeriodSeconds(3)
                       + container.mixin.livenessProbe.withTimeoutSeconds(5),
@@ -104,8 +112,8 @@
                     replicas=1,
                     containers=[
                       container.new(c.search.name, $._images.talkyard.search + ':' + $._version.talkyard.version)
-                      + container.withPorts([port.new(c.search.ports.default.name, c.search.ports.default.port)])
-                      + container.withEnvMap(c.search.env)
+                      + container.withPorts(containerPorts(c.search.ports))
+                      + container.withEnvFrom([container.envFromType.mixin.configMapRef.withName(self.envConfigMap.metadata.name)])
                       + container.mixin.readinessProbe.exec.withCommand(['/bin/sh', '-c', importstr 'files/elastisearch-readiness.sh'],)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(30)
                       + container.mixin.readinessProbe.withTimeoutSeconds(5)
@@ -125,6 +133,8 @@
                                 + configMap.withData({
                                   'log4j2.properties': importstr 'files/log4j2.properties',
                                 }),
+      envConfigMap: configMap.new(c.search.name + '-environment-vars')
+                    + configMap.withData(c.search.env),
     },
     web: {
       deployment: deployment.new(
@@ -132,14 +142,9 @@
                     replicas=1,
                     containers=[
                       container.new(c.web.name, $._images.talkyard.web + ':' + $._version.talkyard.version)
-                      + container.withPorts(
-                        [
-                          port.new(c.web.ports.http.name, c.web.ports.http.port),
-                          port.new(c.web.ports.https.name, c.web.ports.https.port),
-                        ]
-                      )
+                      + container.withPorts(containerPorts(c.web.ports))
                       + container.mixin.readinessProbe.httpGet.withPath('/-/ping-nginx')
-                      + container.mixin.readinessProbe.httpGet.withPort('http')
+                      + container.mixin.readinessProbe.httpGet.withPort(c.web.ports[0].name)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
                       + container.mixin.readinessProbe.withPeriodSeconds(5),
                     ],

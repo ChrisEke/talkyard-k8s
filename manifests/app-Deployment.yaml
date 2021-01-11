@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/part-of: talkyard
     app.kubernetes.io/version: v0.2021.01-923ae76d3
   name: app
-  namespace: talkyard-test
+  namespace: talkyard
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -33,8 +33,9 @@ spec:
             secretKeyRef:
               key: play-secret-key
               name: talkyard-app-secret
-        - name: PLAY_HEAP_MEMORY_MB
-          value: "256"
+        envFrom:
+        - configMapRef:
+            name: app-environment-var
         image: debiki/talkyard-app:v0.2021.01-923ae76d3
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -45,8 +46,10 @@ spec:
           timeoutSeconds: 5
         name: app
         ports:
-        - containerPort: 9000
+        - containerPort: 7000
           name: http
+        - containerPort: 9000
+          name: https
         readinessProbe:
           httpGet:
             path: /-/are-scripts-ready

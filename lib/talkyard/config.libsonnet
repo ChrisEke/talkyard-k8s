@@ -14,45 +14,38 @@
         labels: {
           'app.kubernetes.io/component': 'application',
         },
-        env: {
-          PLAY_HEAP_MEMORY_MB: '256',
-        },
+        ports: [
+          { name: 'http', port: 7000 },
+          { name: 'https', port: 9000 },
+        ],
+        env: {},
       },
       rdb: {
         name: 'rdb',
         labels: {
           'app.kubernetes.io/component': 'database',
         },
-        ports: {
-          default: {
-            name: 'default',
-            port: 5432,
-          },
-        },
+        ports: [
+          { name: 'default', port: 5432 },
+        ],
       },
       cache: {
         name: 'cache',
         labels: {
           'app.kubernetes.io/component': 'cache',
         },
-        ports: {
-          default: {
-            name: 'default',
-            port: 6379,
-          },
-        },
+        ports: [
+          { name: 'default', port: 6379 },
+        ],
       },
       search: {
         name: 'search',
         labels: {
           'app.kubernetes.io/component': 'search',
         },
-        ports: {
-          default: {
-            name: 'default',
-            port: 9300,
-          },
-        },
+        ports: [
+          { name: 'default', port: 9300 },
+        ],
         env: {
           ES_JAVA_OPTS: '-Xms192m -Xmx192m',
           'bootstrap.memory_lock': 'true',
@@ -63,22 +56,16 @@
         labels: {
           'app.kubernetes.io/component': 'webserver',
         },
-        ports: {
-          http: {
-            name: 'http',
-            port: 80,
-          },
-          https: {
-            name: 'https',
-            port: 443,
-          },
-        },
+        ports: [
+          { name: 'http', port: 80 },
+          { name: 'https', port: 443 },
+        ],
       },
     },
   },
   _version+:: {
     talkyard: {
-      version: 'v0.2021.01-923ae76d3',
+      version: 'latest',
     },
   },
   _images+:: {

@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/part-of: talkyard
     app.kubernetes.io/version: v0.2021.01-923ae76d3
   name: rdb
-  namespace: talkyard-test
+  namespace: talkyard
 spec:
   replicas: 1
   selector:

@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/part-of: talkyard
     app.kubernetes.io/version: v0.2021.01-923ae76d3
   name: search
-  namespace: talkyard-test
+  namespace: talkyard
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -22,11 +22,9 @@ spec:
         name: search
     spec:
       containers:
-      - env:
-        - name: ES_JAVA_OPTS
-          value: -Xms192m -Xmx192m
-        - name: bootstrap.memory_lock
-          value: "true"
+      - envFrom:
+        - configMapRef:
+            name: search-environment-vars
         image: debiki/talkyard-search:v0.2021.01-923ae76d3
         imagePullPolicy: IfNotPresent
         name: search

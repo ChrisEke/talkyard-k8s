@@ -4,10 +4,13 @@ metadata:
   labels:
     name: app
   name: app
-  namespace: talkyard-test
+  namespace: talkyard
 spec:
   ports:
   - name: app-http
+    port: 7000
+    targetPort: 7000
+  - name: app-https
     port: 9000
     targetPort: 9000
   selector:

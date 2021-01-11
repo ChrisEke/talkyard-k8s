@@ -4,7 +4,7 @@ metadata:
   labels:
     name: search
   name: search
-  namespace: talkyard-test
+  namespace: talkyard
 spec:
   ports:
   - name: search-default
