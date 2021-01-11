@@ -7,3 +7,4 @@
 
 - add nodeselectors
 - fix statefulset pvc 
+- version script
