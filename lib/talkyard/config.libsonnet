@@ -6,10 +6,10 @@
     talkyard: {
       name: 'talkyard',
       namespace: {
-        name: 'talkyard',
+        name: $._config.talkyard.name,
       },
       commonLabels: {
-        'app.kubernetes.io/part-of': 'talkyard',
+        'app.kubernetes.io/part-of': $._config.talkyard.name,
         'app.kubernetes.io/version': $._version.talkyard.version,
       },
       app: {

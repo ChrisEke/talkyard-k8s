@@ -16,6 +16,7 @@
   ],
 
   talkyard: {
+    namespace: $.core.v1.namespace.new(c.namespace.name),
     app: {
       deployment: deployment.new(
                     name=c.app.name,
@@ -24,8 +25,8 @@
                       container.new(c.app.name, $._images.talkyard.app + ':' + $._version.talkyard.version)
                       + container.withPorts(containerPorts(c.app.ports))
                       + container.withEnv([
-                        container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secret', 'postgres-password'),
-                        container.envType.fromSecretRef('PLAY_SECRET_KEY', 'talkyard-app-secret', 'play-secret-key'),
+                        container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
+                        container.envType.fromSecretRef('PLAY_SECRET_KEY', 'talkyard-app-secrets', 'play-secret-key'),
                       ])
                       + container.withEnvFrom([container.envFromType.mixin.configMapRef.withName(self.envConfigMap.metadata.name)])
                       + container.mixin.readinessProbe.httpGet.withPath('/-/are-scripts-ready')
@@ -55,7 +56,7 @@
                        container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version.talkyard.version)
                        + container.withPorts(containerPorts(c.rdb.ports))
                        + container.withEnv([
-                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secret', 'postgres-password'),
+                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
                        ])
                        + container.mixin.readinessProbe.exec.withCommand(
                          ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
