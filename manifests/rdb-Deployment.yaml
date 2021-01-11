@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: database
@@ -8,11 +8,12 @@ metadata:
   name: rdb
   namespace: talkyard
 spec:
+  minReadySeconds: 10
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       name: rdb
-  serviceName: rdb
   template:
     metadata:
       annotations:
@@ -58,7 +59,3 @@ spec:
       - configMap:
           name: rdb-init-sh-override
         name: rdb-init-sh-override
-  updateStrategy:
-    type: RollingUpdate
-  volumeClaimTemplates:
-  - {}

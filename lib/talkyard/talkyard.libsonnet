@@ -2,13 +2,11 @@
 (import './config.libsonnet') +
 {
   local deployment = $.apps.v1.deployment,
-  local statefulSet = $.apps.v1.statefulSet,
   local container = $.core.v1.container,
   local port = $.core.v1.containerPort,
   local service = $.core.v1.service,
   local configMap = $.core.v1.configMap,
   local volumeMount = $.core.v1.volumeMount,
-  local persistentVolumeClaim = $.core.v1.persistentVolumeClaim,
 
   local c = $._config.talkyard,
 
@@ -50,12 +48,9 @@
                     + configMap.withData(c.app.env),
     },
     rdb: {
-      statefulSet: statefulSet.new(
+      deployment: deployment.new(
                      name=c.rdb.name,
                      replicas=1,
-                     volumeClaims=[
-                       persistentVolumeClaim.new(),
-                     ],
                      containers=[
                        container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version.talkyard.version)
                        + container.withPorts(containerPorts(c.rdb.ports))
@@ -76,10 +71,9 @@
                        + container.mixin.livenessProbe.withTimeoutSeconds(6),
                      ],
                    )
-                   + statefulSet.mixin.metadata.withLabels(c.commonLabels + c.rdb.labels)
-                   + statefulSet.mixin.spec.withServiceName(c.rdb.name)
+                   + deployment.mixin.metadata.withLabels(c.commonLabels + c.rdb.labels)
                    + $.util.configMapVolumeMount(self.initShOverrideConfigMap, '/docker-entrypoint-initdb.d'),
-      service: $.util.serviceFor(self.statefulSet),
+      service: $.util.serviceFor(self.deployment),
       initShOverrideConfigMap: configMap.new(c.rdb.name + '-init-sh-override')
                                + configMap.withData({
                                  'init.sh': importstr 'files/init.sh',
