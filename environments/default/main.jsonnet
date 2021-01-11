@@ -1,6 +1,5 @@
-(import 'ksonnet-util/kausal.libsonnet')
-+ (import 'talkyard/talkyard.libsonnet')
-+ (import 'talkyard_version.jsonnet')
+(import 'ksonnet-util/kausal.libsonnet') +
+(import 'talkyard/talkyard.libsonnet')
 
   {
   _config+:: {

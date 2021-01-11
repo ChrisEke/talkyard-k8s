@@ -1,5 +1,7 @@
 (import 'ksonnet-util/kausal.libsonnet') +
-(import './config.libsonnet') +
+(import 'config.libsonnet') +
+(import 'talkyard-version.libsonnet') +
+
 {
   local deployment = $.apps.v1.deployment,
   local container = $.core.v1.container,

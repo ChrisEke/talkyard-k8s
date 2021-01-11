@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-tanka_environment="default"
 talkyard_version_url="https://raw.githubusercontent.com/debiki/talkyard-versions/master/version-tags.log"
 manifest_dir="manifests"
 kustomize_base="kustomization.yaml"
@@ -7,7 +6,7 @@ kustomize_manifests="$manifest_dir/$kustomize_base"
 
 # Get latest Talkyard version
 latest_version=$(curl -S --silent $talkyard_version_url | grep -v -e "WIP\|^$" | tail -1)
-echo '{ _version+:: { talkyard+:: { version: "'$latest_version'" }}}' > environments/$tanka_environment/talkyard_version.jsonnet
+echo '{ _version+:: { talkyard+:: { version: "'$latest_version'" }}}' > lib/talkyard/talkyard-version.libsonnet
 
 ## Start clean by removing old manifests
 rm -r $manifest_dir/
