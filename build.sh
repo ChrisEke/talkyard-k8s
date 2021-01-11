@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
-rm -r manifests/ 
-tk export environments/default ./manifests --format='{{.metadata.name}}-{{.kind}}'
+#rm -r manifests/ 
+#tk export environments/default ./manifests --format='{{.metadata.name}}-{{.kind}}'
 
-file="./kustomization.yaml"
+file1="manifests/kustomization.yaml"
+file2="kustomization.yaml"
 
-echo "apiVersion: kustomize.config.k8s.io/v1beta1" > $file
-echo "kind: Kustomization" >> $file
-echo "resources:" >> $file
+echo "apiVersion: kustomize.config.k8s.io/v1beta1" | tee $file1 $file2 > /dev/null
+echo "kind: Kustomization" | tee -a $file1 $file2 > /dev/null
+echo "resources:" | tee -a $file1 $file2 > /dev/null
 
 # use nullglob in case there are no matching files
 shopt -s nullglob
 # create an array with all the filer/dir inside ~/myDir
-arr=(manifests/*)
-# iterate through array using a counter
-for ((i=0; i<${#arr[@]}; i++)); do
-    #do something to each element of array
-    echo "- ${arr[$i]}" >> $file
+files=(manifests/*)
+
+for f in "${files[@]}"; do
+    f=$(basename $f)
+    echo "- $f" | tee -a $file1 > /dev/null
 done
+
+echo "- manifests" | tee -a $file2 > /dev/null
