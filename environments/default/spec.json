@@ -6,7 +6,7 @@
   },
   "spec": {
     "apiServer": "",
-    "namespace": "talkyard",
+    "namespace": "talkyard-test",
     "resourceDefaults": {},
     "expectVersions": {}
   }
