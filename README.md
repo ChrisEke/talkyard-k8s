@@ -16,7 +16,8 @@ Two alternatives:
 
 **Pre-requisites:**
 
-- k8s cluster with amd64 nodes 
+- k8s cluster with amd64 nodes
+- kubectl installed and $KUBECONFIG configured with the cluster
 - Tanka and Jsonnet Bundler installed. See [tanka.dev/install](https://tanka.dev/install)
 
 **Install:**
