@@ -47,7 +47,7 @@
                               + configMap.withData({
                                 'app-prod-override.conf': importstr 'files/play-framework.conf',
                               }),
-      envConfigMap: configMap.new(c.app.name + '-environment-var')
+      envConfigMap: configMap.new(c.app.name + '-environment-vars')
                     + configMap.withData(c.app.env),
     },
     rdb: {
