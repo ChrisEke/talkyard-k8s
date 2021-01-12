@@ -14,6 +14,8 @@ Two alternatives:
 1. With [Tanka](https://tanka.dev) and leverage this repository as a jsonnet library.
 2. With [Kustomize](https://github.com/kubernetes-sigs/kustomize/).
 
+**To-do:** Write how to include play-framework-conf and override configuration. 
+
 ### Tanka
 
 **Pre-requisites:**

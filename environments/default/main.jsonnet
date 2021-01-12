@@ -1,6 +1,16 @@
 (import 'talkyard/talkyard.libsonnet')
 
+
 {
+  // local configMap = $.core.v1.configMap,
+  // talkyard+: {
+  //   app+: {
+  //     playFrameworkConfigMap: configMap.new('app-play-framework-conf')
+  //                             + configMap.withData({
+  //                               'app-prod-override.conf': importstr 'play-framework.conf',
+  //                             }),
+  //   },
+  // },
   _config+:: {
     talkyard+:: {
       app+:: {

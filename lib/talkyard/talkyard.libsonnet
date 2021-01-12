@@ -42,12 +42,8 @@
                     ],
                   )
                   + deployment.mixin.metadata.withLabels(c.commonLabels + c.app.labels)
-                  + $.util.configMapVolumeMount(self.playFrameworkConfigMap, '/opt/talkyard/app/conf/app-prod-override.conf', volumeMount.withSubPath('app-prod-override.conf')),
+                  + $.util.configVolumeMount(c.app.name + '-play-framework-conf', '/opt/talkyard/app/conf/app-prod-override.conf', volumeMount.withSubPath('app-prod-override.conf')),
       service: $.util.serviceFor(self.deployment),
-      playFrameworkConfigMap: configMap.new(c.app.name + '-play-framework-conf')
-                              + configMap.withData({
-                                'app-prod-override.conf': importstr 'files/play-framework.conf',
-                              }),
       envConfigMap: configMap.new(c.app.name + '-environment-vars')
                     + configMap.withData(c.app.env),
     },

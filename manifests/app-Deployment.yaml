@@ -16,8 +16,6 @@ spec:
       name: app
   template:
     metadata:
-      annotations:
-        app-play-framework-conf-hash: c563f1c9d47ed6df9672ede20cf98b09
       labels:
         name: app
     spec:
