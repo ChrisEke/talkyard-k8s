@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
 - app-Deployment.yaml
 - app-environment-vars-ConfigMap.yaml
-- app-play-framework-conf-ConfigMap.yaml
 - app-Service.yaml
 - cache-Deployment.yaml
 - cache-Service.yaml
