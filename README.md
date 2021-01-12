@@ -1,7 +1,14 @@
 # talkyard-k8s
+## How to deploy
 
-1. tk init
-2. rm -r manifests/; tk export environments/default ./manifests --format='{{.metadata.name}}-{{.kind}}'
+Two alternatives: 
+
+### Tanka
+1. mkdir talkyard && cd talkyard
+2. tk init
+3. Update main.jsonett and spec.json in environments/default (or whichever environment that is preffered) 
+4. Add secrets 
+5. tk apply environment/default
 
 
 ## Running in mixed amd64/arm cluster
@@ -33,9 +40,17 @@ patches:
       kind: Deployment
 ```
 
+## Localhost
+
+```shell
+kubectl exec web-546846b96d-f7vfq -- sed -i 's/proxy_set_header Host \$host/proxy_set_header Host \$http_host/' /etc/nginx/server-locations.conf 
+
+kubectl exec web-546846b96d-f7vfq -- nginx -s reload
+```
 ## Todo
 
-- add nodeselectors - Done - see example above
-- fix statefulset pvc - Done changed to deployment 
-- version script - Done
-- Check if easy way to demo with localhost port-forward
+- add nodeselectors - **Done** - see example above
+- fix statefulset pvc - **Done** changed to deployment 
+- version script - **Done**
+- Check if easy way to demo with localhost port-forward - **Done**
+- Write up deployment with Tanka and kustomize - *In progress*
