@@ -7,10 +7,10 @@ Talkyard source repo @ [github.com/debiki/talkyard](https://github.com/debiki/ta
 
 ## How to deploy/quickstart
 
-Two preffered alternatives: 
+Two alternatives: 
 
 1. With [Tanka](https://tanka.dev) and leverage this repository as a jsonnet library.
-2. With [Kustomize](https://github.com/kubernetes-sigs/kustomize/)
+2. With [Kustomize](https://github.com/kubernetes-sigs/kustomize/).
 
 ### Tanka
 
@@ -74,7 +74,7 @@ Two preffered alternatives:
     }
     ```
 
-3. Apply to k8s-cluster:
+3. Apply to k8s cluster:
    
    ```shell
    tk apply environments/default
@@ -88,6 +88,48 @@ Two preffered alternatives:
     ```
 
 ### Kustomize
+
+**Pre-requisites:**
+
+- k8s cluster with amd64 nodes
+- kubectl installed and $KUBECONFIG configured with the cluster
+- kustomize installed. See [kubectl.docs.kubernetes.io/installation/kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/)
+
+**Install:**
+
+1. Create a project area
+    
+    ```shell
+    mkdir talkyard && cd talkyard
+    ```
+
+2. Setup `kustomization.yaml`-file. secretGenerator for mandatory secrets has been included in example below.
+   
+    ```shell
+    cat << EOF > kustomization.yaml
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
+
+    namespace: talkyard
+
+    secretGenerator:
+      - name: talkyard-app-secrets
+        literals:
+          - play-secret-key='my-secret-key'
+
+      - name: talkyard-rdb-secrets
+        literals:
+          - postgres-password='my-postgres-password'
+
+    resources:
+    - github.com/ChrisEke/talkyard-k8s?ref=develop
+    EOF
+    ```
+3. Apply to k8s cluster.
+   
+   ```shell
+   kustomize build . | kubectl apply -f -
+  ```
 
 ## Running in mixed amd64/arm cluster
 Add nodeSelector to deployments: 
