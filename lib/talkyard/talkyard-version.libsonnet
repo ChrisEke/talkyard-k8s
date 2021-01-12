@@ -1,1 +1,1 @@
-{ _version+:: { talkyard+:: { version: 'v0.2021.01-923ae76d3' } } }
+{ _version+:: 'v0.2021.01-923ae76d3' }

@@ -1,69 +1,53 @@
 {
-  // +:: is important (we don't want to override the
-  // _config object, just add to it)
   _config+:: {
-    // define a namespace for this library
-    talkyard: {
-      name: 'talkyard',
-      namespace: {
-        name: $._config.talkyard.name,
+    name: 'talkyard',
+    namespace: self.name,
+    app: {
+      name: 'app',
+      labels: {
+        'app.kubernetes.io/component': 'application',
       },
-      commonLabels: {
-        'app.kubernetes.io/part-of': $._config.talkyard.name,
-        'app.kubernetes.io/version': $._version.talkyard.version,
-      },
-      app: {
-        name: 'app',
-        labels: {
-          'app.kubernetes.io/component': 'application',
-        },
-        ports: [
-          { name: 'http', port: 9000 },
-        ],
-        env: {},
-      },
-      rdb: {
-        name: 'rdb',
-        labels: {
-          'app.kubernetes.io/component': 'database',
-        },
-        ports: [
-          { name: 'default', port: 5432 },
-        ],
-      },
-      cache: {
-        name: 'cache',
-        labels: {
-          'app.kubernetes.io/component': 'cache',
-        },
-        ports: [
-          { name: 'default', port: 6379 },
-        ],
-      },
-      search: {
-        name: 'search',
-        labels: {
-          'app.kubernetes.io/component': 'search',
-        },
-        ports: [
-          { name: 'default', port: 9300 },
-        ],
-        env: {},
-      },
-      web: {
-        name: 'web',
-        labels: {
-          'app.kubernetes.io/component': 'webserver',
-        },
-        ports: [
-          { name: 'http', port: 80 },
-        ],
-      },
+      ports: [
+        { name: 'http', port: 9000 },
+      ],
+      env: {},
     },
-  },
-  _version+:: {
-    talkyard: {
-      version: 'latest',
+    rdb: {
+      name: 'rdb',
+      labels: {
+        'app.kubernetes.io/component': 'database',
+      },
+      ports: [
+        { name: 'default', port: 5432 },
+      ],
+    },
+    cache: {
+      name: 'cache',
+      labels: {
+        'app.kubernetes.io/component': 'cache',
+      },
+      ports: [
+        { name: 'default', port: 6379 },
+      ],
+    },
+    search: {
+      name: 'search',
+      labels: {
+        'app.kubernetes.io/component': 'search',
+      },
+      ports: [
+        { name: 'default', port: 9300 },
+      ],
+      env: {},
+    },
+    web: {
+      name: 'web',
+      labels: {
+        'app.kubernetes.io/component': 'webserver',
+      },
+      ports: [
+        { name: 'http', port: 80 },
+      ],
     },
   },
   _images+:: {

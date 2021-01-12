@@ -11,21 +11,25 @@
   local configMap = $.core.v1.configMap,
   local volumeMount = $.core.v1.volumeMount,
 
-  local c = $._config.talkyard,
+  local c = self._config,
 
   local containerPorts(o) = [
     { name: p.name, containerPort: p.port }
     for p in o
   ],
 
+  local commonLabels = {
+    'app.kubernetes.io/part-of': c.name,
+    'app.kubernetes.io/version': $._version,
+  },
   talkyard: {
-    namespace: $.core.v1.namespace.new(c.namespace.name),
+    namespace: $.core.v1.namespace.new(c.namespace),
     app: {
       deployment: deployment.new(
                     name=c.app.name,
                     replicas=1,
                     containers=[
-                      container.new(c.app.name, $._images.talkyard.app + ':' + $._version.talkyard.version)
+                      container.new(c.app.name, $._images.talkyard.app + ':' + $._version)
                       + container.withPorts(containerPorts(c.app.ports))
                       + container.withEnv([
                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
@@ -41,7 +45,7 @@
                       + container.mixin.livenessProbe.withTimeoutSeconds(5),
                     ],
                   )
-                  + deployment.mixin.metadata.withLabels(c.commonLabels + c.app.labels)
+                  + deployment.mixin.metadata.withLabels(commonLabels + c.app.labels)
                   + $.util.configVolumeMount(c.app.name + '-play-framework-conf', '/opt/talkyard/app/conf/app-prod-override.conf', volumeMount.withSubPath('app-prod-override.conf')),
       service: $.util.serviceFor(self.deployment),
       envConfigMap: configMap.new(c.app.name + '-environment-vars')
@@ -52,7 +56,7 @@
                     name=c.rdb.name,
                     replicas=1,
                     containers=[
-                      container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version.talkyard.version)
+                      container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version)
                       + container.withPorts(containerPorts(c.rdb.ports))
                       + container.withEnv([
                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
@@ -67,7 +71,7 @@
                       + container.mixin.livenessProbe.withTimeoutSeconds(6),
                     ],
                   )
-                  + deployment.mixin.metadata.withLabels(c.commonLabels + c.rdb.labels)
+                  + deployment.mixin.metadata.withLabels(commonLabels + c.rdb.labels)
                   + $.util.configMapVolumeMount(self.initShOverrideConfigMap, '/docker-entrypoint-initdb.d'),
       service: $.util.serviceFor(self.deployment),
       initShOverrideConfigMap: configMap.new(c.rdb.name + '-init-sh-override')
@@ -80,7 +84,7 @@
                     name=c.cache.name,
                     replicas=1,
                     containers=[
-                      container.new(c.cache.name, $._images.talkyard.cache + ':' + $._version.talkyard.version)
+                      container.new(c.cache.name, $._images.talkyard.cache + ':' + $._version)
                       + container.withPorts(containerPorts(c.cache.ports))
                       + container.mixin.readinessProbe.exec.withCommand($._probe.cache.readiness.execCommand)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(20)
@@ -92,16 +96,15 @@
                       + container.mixin.livenessProbe.withTimeoutSeconds(5),
                     ],
                   )
-                  + deployment.mixin.metadata.withLabels(c.commonLabels + c.cache.labels),
+                  + deployment.mixin.metadata.withLabels(commonLabels + c.cache.labels),
       service: $.util.serviceFor(self.deployment),
-
     },
     search: {
       deployment: deployment.new(
                     name=c.search.name,
                     replicas=1,
                     containers=[
-                      container.new(c.search.name, $._images.talkyard.search + ':' + $._version.talkyard.version)
+                      container.new(c.search.name, $._images.talkyard.search + ':' + $._version)
                       + container.withPorts(containerPorts(c.search.ports))
                       + container.withEnvFrom([container.envFromType.mixin.configMapRef.withName(self.envConfigMap.metadata.name)])
                       + container.mixin.readinessProbe.exec.withCommand($._probe.search.readiness.execCommand)
@@ -111,7 +114,7 @@
                       + container.mixin.readinessProbe.withSuccessThreshold(3),
                     ],
                   )
-                  + deployment.mixin.metadata.withLabels(c.commonLabels + c.search.labels)
+                  + deployment.mixin.metadata.withLabels(commonLabels + c.search.labels)
 
                   + $.util.configMapVolumeMount(
                     self.log4j2PropertiesOverride,
@@ -131,7 +134,7 @@
                     name=c.web.name,
                     replicas=1,
                     containers=[
-                      container.new(c.web.name, $._images.talkyard.web + ':' + $._version.talkyard.version)
+                      container.new(c.web.name, $._images.talkyard.web + ':' + $._version)
                       + container.withPorts(containerPorts(c.web.ports))
                       + container.mixin.readinessProbe.httpGet.withPath($._probe.web.readiness.httpPath)
                       + container.mixin.readinessProbe.httpGet.withPort(c.web.ports[0].name)
@@ -139,7 +142,7 @@
                       + container.mixin.readinessProbe.withPeriodSeconds(5),
                     ],
                   )
-                  + deployment.mixin.metadata.withLabels(c.commonLabels + c.web.labels),
+                  + deployment.mixin.metadata.withLabels(commonLabels + c.web.labels),
       service: $.util.serviceFor(self.deployment),
     },
   },

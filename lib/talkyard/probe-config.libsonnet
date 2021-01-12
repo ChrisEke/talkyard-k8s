@@ -38,7 +38,7 @@
     },
     rdb: {
       readiness: {
-        execCommand: ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + $._config.talkyard.rdb.ports[0].port],
+        execCommand: ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + $._config.rdb.ports[0].port],
       },
       liveness: {
         execCommand: $._probe.rdb.readiness.execCommand,

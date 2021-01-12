@@ -9,7 +9,7 @@ kustomize_manifests="$manifest_dir/$kustomize_base"
 
 # Get latest Talkyard version
 latest_version=$(curl -S --silent --fail $talkyard_version_url | grep -v -e "WIP\|^$" | tail -1; test ${PIPESTATUS[0]} -eq 0)
-echo "{ _version+:: { talkyard+:: { version: '"$latest_version"' } } }" > $talkyard_version_output
+echo "{ _version+:: '"$latest_version"' }" > $talkyard_version_output
 
 ## Start clean by removing old manifests
 mkdir -p $manifest_dir
