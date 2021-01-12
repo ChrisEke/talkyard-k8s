@@ -128,11 +128,12 @@ Two alternatives:
     ```
 3. Apply to k8s cluster.
    
-   ```shell
-   kustomize build . | kubectl apply -f -
-  ```
+    ```shell
+    kustomize build . | kubectl apply -f -
+    ```
 
 ## Running in mixed amd64/arm cluster
+
 Add nodeSelector to deployments: 
 
 **Kustomize**: 
