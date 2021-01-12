@@ -1,5 +1,6 @@
 (import 'ksonnet-util/kausal.libsonnet') +
 (import 'config.libsonnet') +
+(import 'probe-config.libsonnet') +
 (import 'talkyard-version.libsonnet') +
 
 {
@@ -31,7 +32,7 @@
                         container.envType.fromSecretRef('PLAY_SECRET_KEY', 'talkyard-app-secrets', 'play-secret-key'),
                       ])
                       + container.withEnvFrom([container.envFromType.mixin.configMapRef.withName(self.envConfigMap.metadata.name)])
-                      + container.mixin.readinessProbe.httpGet.withPath('/-/are-scripts-ready')
+                      + container.mixin.readinessProbe.httpGet.withPath($._probe.app.readiness.httpPath)
                       + container.mixin.readinessProbe.httpGet.withPort('http')
                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
                       + container.mixin.livenessProbe.tcpSocket.withPort('http')
@@ -60,15 +61,11 @@
                       + container.withEnv([
                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
                       ])
-                      + container.mixin.readinessProbe.exec.withCommand(
-                        ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
-                      )
+                      + container.mixin.readinessProbe.exec.withCommand($._probe.rdb.readiness.execCommand)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
                       + container.mixin.readinessProbe.withTimeoutSeconds(6)
                       + container.mixin.readinessProbe.withPeriodSeconds(30)
-                      + container.mixin.livenessProbe.exec.withCommand(
-                        ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
-                      )
+                      + container.mixin.livenessProbe.exec.withCommand($._probe.rdb.liveness.execCommand)
                       + container.mixin.livenessProbe.withInitialDelaySeconds(30)
                       + container.mixin.livenessProbe.withPeriodSeconds(30)
                       + container.mixin.livenessProbe.withTimeoutSeconds(6),
@@ -89,7 +86,7 @@
                     containers=[
                       container.new(c.cache.name, $._images.talkyard.cache + ':' + $._version.talkyard.version)
                       + container.withPorts(containerPorts(c.cache.ports))
-                      + container.mixin.readinessProbe.exec.withCommand(['redis-cli', 'ping'],)
+                      + container.mixin.readinessProbe.exec.withCommand($._probe.cache.readiness.execCommand)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(20)
                       + container.mixin.readinessProbe.withTimeoutSeconds(5)
                       + container.mixin.readinessProbe.withPeriodSeconds(3)
@@ -111,7 +108,7 @@
                       container.new(c.search.name, $._images.talkyard.search + ':' + $._version.talkyard.version)
                       + container.withPorts(containerPorts(c.search.ports))
                       + container.withEnvFrom([container.envFromType.mixin.configMapRef.withName(self.envConfigMap.metadata.name)])
-                      + container.mixin.readinessProbe.exec.withCommand(['/bin/sh', '-c', importstr 'files/elastisearch-readiness.sh'],)
+                      + container.mixin.readinessProbe.exec.withCommand($._probe.search.readiness.execCommand)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(30)
                       + container.mixin.readinessProbe.withTimeoutSeconds(5)
                       + container.mixin.readinessProbe.withPeriodSeconds(10)
@@ -140,7 +137,7 @@
                     containers=[
                       container.new(c.web.name, $._images.talkyard.web + ':' + $._version.talkyard.version)
                       + container.withPorts(containerPorts(c.web.ports))
-                      + container.mixin.readinessProbe.httpGet.withPath('/-/ping-nginx')
+                      + container.mixin.readinessProbe.httpGet.withPath($._probe.web.readiness.httpPath)
                       + container.mixin.readinessProbe.httpGet.withPort(c.web.ports[0].name)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
                       + container.mixin.readinessProbe.withPeriodSeconds(5),
