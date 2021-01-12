@@ -29,7 +29,7 @@
                     name=c.app.name,
                     replicas=1,
                     containers=[
-                      container.new(c.app.name, $._images.talkyard.app + ':' + $._version)
+                      container.new(c.app.name, $._images.app + ':' + $._version)
                       + container.withPorts(containerPorts(c.app.ports))
                       + container.withEnv([
                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
@@ -56,7 +56,7 @@
                     name=c.rdb.name,
                     replicas=1,
                     containers=[
-                      container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version)
+                      container.new(c.rdb.name, $._images.rdb + ':' + $._version)
                       + container.withPorts(containerPorts(c.rdb.ports))
                       + container.withEnv([
                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
@@ -84,7 +84,7 @@
                     name=c.cache.name,
                     replicas=1,
                     containers=[
-                      container.new(c.cache.name, $._images.talkyard.cache + ':' + $._version)
+                      container.new(c.cache.name, $._images.cache + ':' + $._version)
                       + container.withPorts(containerPorts(c.cache.ports))
                       + container.mixin.readinessProbe.exec.withCommand($._probe.cache.readiness.execCommand)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(20)
@@ -104,7 +104,7 @@
                     name=c.search.name,
                     replicas=1,
                     containers=[
-                      container.new(c.search.name, $._images.talkyard.search + ':' + $._version)
+                      container.new(c.search.name, $._images.search + ':' + $._version)
                       + container.withPorts(containerPorts(c.search.ports))
                       + container.withEnvFrom([container.envFromType.mixin.configMapRef.withName(self.envConfigMap.metadata.name)])
                       + container.mixin.readinessProbe.exec.withCommand($._probe.search.readiness.execCommand)
@@ -134,7 +134,7 @@
                     name=c.web.name,
                     replicas=1,
                     containers=[
-                      container.new(c.web.name, $._images.talkyard.web + ':' + $._version)
+                      container.new(c.web.name, $._images.web + ':' + $._version)
                       + container.withPorts(containerPorts(c.web.ports))
                       + container.mixin.readinessProbe.httpGet.withPath($._probe.web.readiness.httpPath)
                       + container.mixin.readinessProbe.httpGet.withPort(c.web.ports[0].name)
