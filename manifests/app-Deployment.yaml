@@ -35,7 +35,7 @@ spec:
               name: talkyard-app-secrets
         envFrom:
         - configMapRef:
-            name: app-environment-var
+            name: app-environment-vars
         image: debiki/talkyard-app:v0.2021.01-923ae76d3
         imagePullPolicy: IfNotPresent
         livenessProbe:

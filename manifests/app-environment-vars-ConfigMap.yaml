@@ -3,5 +3,5 @@ data:
   PLAY_HEAP_MEMORY_MB: "256"
 kind: ConfigMap
 metadata:
-  name: app-environment-var
+  name: app-environment-vars
   namespace: talkyard
