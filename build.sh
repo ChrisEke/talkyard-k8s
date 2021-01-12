@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 talkyard_version_url="https://raw.githubusercontent.com/debiki/talkyard-versions/master/version-tags.log"
+talkyard_version_output="lib/talkyard/talkyard-version.libsonnet"
 manifest_dir="manifests"
 kustomize_base="kustomization.yaml"
 kustomize_manifests="$manifest_dir/$kustomize_base"
 
 # Get latest Talkyard version
 latest_version=$(curl -S --silent $talkyard_version_url | grep -v -e "WIP\|^$" | tail -1)
-echo '{ _version+:: { talkyard+:: { version: "'$latest_version'" }}}' > lib/talkyard/talkyard-version.libsonnet
+echo "{ _version+:: { talkyard+:: { version: '"$latest_version"' } } }" > $talkyard_version_output
 
 ## Start clean by removing old manifests
 rm -r $manifest_dir/

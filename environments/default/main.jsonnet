@@ -1,7 +1,7 @@
 (import 'ksonnet-util/kausal.libsonnet') +
 (import 'talkyard/talkyard.libsonnet')
 
-  {
+{
   _config+:: {
     talkyard+:: {
       app+:: {

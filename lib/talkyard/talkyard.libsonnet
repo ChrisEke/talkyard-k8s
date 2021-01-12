@@ -52,30 +52,30 @@
     },
     rdb: {
       deployment: deployment.new(
-                     name=c.rdb.name,
-                     replicas=1,
-                     containers=[
-                       container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version.talkyard.version)
-                       + container.withPorts(containerPorts(c.rdb.ports))
-                       + container.withEnv([
-                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
-                       ])
-                       + container.mixin.readinessProbe.exec.withCommand(
-                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
-                       )
-                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
-                       + container.mixin.readinessProbe.withTimeoutSeconds(6)
-                       + container.mixin.readinessProbe.withPeriodSeconds(30)
-                       + container.mixin.livenessProbe.exec.withCommand(
-                         ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
-                       )
-                       + container.mixin.livenessProbe.withInitialDelaySeconds(30)
-                       + container.mixin.livenessProbe.withPeriodSeconds(30)
-                       + container.mixin.livenessProbe.withTimeoutSeconds(6),
-                     ],
-                   )
-                   + deployment.mixin.metadata.withLabels(c.commonLabels + c.rdb.labels)
-                   + $.util.configMapVolumeMount(self.initShOverrideConfigMap, '/docker-entrypoint-initdb.d'),
+                    name=c.rdb.name,
+                    replicas=1,
+                    containers=[
+                      container.new(c.rdb.name, $._images.talkyard.rdb + ':' + $._version.talkyard.version)
+                      + container.withPorts(containerPorts(c.rdb.ports))
+                      + container.withEnv([
+                        container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
+                      ])
+                      + container.mixin.readinessProbe.exec.withCommand(
+                        ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
+                      )
+                      + container.mixin.readinessProbe.withInitialDelaySeconds(10)
+                      + container.mixin.readinessProbe.withTimeoutSeconds(6)
+                      + container.mixin.readinessProbe.withPeriodSeconds(30)
+                      + container.mixin.livenessProbe.exec.withCommand(
+                        ['/bin/sh', '-c', 'exec pg_isready -U "talkyard" -h 127.0.0.1 -p ' + c.rdb.ports[0].port]
+                      )
+                      + container.mixin.livenessProbe.withInitialDelaySeconds(30)
+                      + container.mixin.livenessProbe.withPeriodSeconds(30)
+                      + container.mixin.livenessProbe.withTimeoutSeconds(6),
+                    ],
+                  )
+                  + deployment.mixin.metadata.withLabels(c.commonLabels + c.rdb.labels)
+                  + $.util.configMapVolumeMount(self.initShOverrideConfigMap, '/docker-entrypoint-initdb.d'),
       service: $.util.serviceFor(self.deployment),
       initShOverrideConfigMap: configMap.new(c.rdb.name + '-init-sh-override')
                                + configMap.withData({
