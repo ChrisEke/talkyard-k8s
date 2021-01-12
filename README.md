@@ -4,19 +4,18 @@ k8s manifests for deployment of [Talkyard](https://www.talkyard.io/) forum softw
 
 The manifests within this repository are fairly minimal and does not include persistent storage, resource requests/limits, HA-configuration etc. The idea is that custom configurations can be done with [Tanka](https://tanka.dev) or [Kustomize](https://github.com/kubernetes-sigs/kustomize/).
 
+For docker-compose install see official repository: [github.com/debiki/talkyard-prod-one](https://github.com/debiki/talkyard-prod-one)
 
-Talkyard source repo @ [github.com/debiki/talkyard](https://github.com/debiki/talkyard)
+Talkyard source repository: [github.com/debiki/talkyard](https://github.com/debiki/talkyard)
 
 ## How to deploy/quickstart
 
 Two alternatives: 
 
 1. With [Tanka](https://tanka.dev) and leverage this repository as a jsonnet library.
-2. With [Kustomize](https://github.com/kubernetes-sigs/kustomize/).
+2. With [Kustomize](https://github.com/kubernetes-sigs/kustomize/) as a remote resource.
 
-**To-do:** Write how to include play-framework-conf and override configuration. 
-
-### Tanka
+### 1. Tanka
 
 **Pre-requisites:**
 
@@ -26,14 +25,21 @@ Two alternatives:
 
 **Install:**
 
-1. Configure a tanka project and import this repository as a library.
+1. Initialize a new Tanka project and import this repository as a library.
     
     ```shell
     mkdir talkyard && cd talkyard
     tk init
     jb install github.com/ChrisEke/talkyard-k8s/lib/talkyard
     ```
-2. In `environments/default` (or whichever environment that is preferred) update `main.jsonnet` and `spec.json`. Namespace **talkyard** is used by default.
+2. Custom configuration of the Talkyard deployment should be done in directory `environments/default` (or whichever environment that is preferred).
+   **REQUIRED:** 
+   - Talkyard-app expects configuration file `play-framework.conf` for custom configurations such as hostname, SMTP, user authentications etc. Place `play-framework.conf` in `environments/default` directory and update desired parameters.  
+   - Update `main.jsonnet` to include play-framework.conf as a ConfigMap.
+   - Update `spec.json` with k8s cluster endpoint and namespace
+   - By default namespace "talkyard" is created. This can be changed in `main.jsonnet`
+
+  Examples from 
    
    *example environments/default/main.jsonnet:*
   
@@ -92,7 +98,7 @@ Two alternatives:
     kubectl create secret generic --namespace=talkyard talkyard-rdb-secrets --from-literal=postgres-password='my-postgres-password'
     ```
 
-### Kustomize
+### 2. Kustomize
 
 **Pre-requisites:**
 
@@ -168,7 +174,9 @@ patches:
 
 ## Verifying deployment on localhost
 
-Port-forwarding Talkyard web service on localhost with an unpriviliged port might result in a blank page. This is due to the $port being stripped from the request URL-header when requesting additional site assets. To temporarily fix this a minor modification can be done to the web pod: 
+Port-forward of Talkyard web service on localhost with an unpriviliged port might result in a blank page. This is due to the $port being stripped from the request URL-header for additional site assets, which consequently leads to failure of loading said assets. 
+
+A temporary fix is to modify the web pod, example: 
 
 ```shell
 kubectl exec web-546846b96d-f7vfq -- \
@@ -177,4 +185,4 @@ kubectl exec web-546846b96d-f7vfq -- \
 
 kubectl exec web-546846b96d-f7vfq -- nginx -s reload
 ```
-Changing nginx parameter $host to $http_host has some security implications. A better and more permanent solution is to apply an ingress object infront of the web service configured with a proper URL.
+Changing nginx parameter $host to $http_host has some security implications. A better and more permanent solution is to apply an ingress object infront of the web service and configure it with a proper URL.
