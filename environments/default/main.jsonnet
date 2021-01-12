@@ -1,6 +1,5 @@
 (import 'talkyard/talkyard.libsonnet')
 
-
 {
   // local configMap = $.core.v1.configMap,
   //   app+: {
