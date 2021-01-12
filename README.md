@@ -1,6 +1,8 @@
 # talkyard-k8s
 
-k8s manifests for [Talkyard](https://www.talkyard.io/) forum software. The manifests within this repository are fairly minimal and does not include persistent storage, resource requests/limits, HA-configuration etc. The idea is that custom configurations can be done with [Tanka](https://tanka.dev) or [Kustomize](https://github.com/kubernetes-sigs/kustomize/).
+k8s manifests for deployment of [Talkyard](https://www.talkyard.io/) forum software. 
+
+The manifests within this repository are fairly minimal and does not include persistent storage, resource requests/limits, HA-configuration etc. The idea is that custom configurations can be done with [Tanka](https://tanka.dev) or [Kustomize](https://github.com/kubernetes-sigs/kustomize/).
 
 
 Talkyard source repo @ [github.com/debiki/talkyard](https://github.com/debiki/talkyard)
@@ -123,7 +125,7 @@ Two alternatives:
           - postgres-password='my-postgres-password'
 
     resources:
-    - github.com/ChrisEke/talkyard-k8s?ref=develop
+    - github.com/ChrisEke/talkyard-k8s
     EOF
     ```
 3. Apply to k8s cluster.
@@ -164,20 +166,13 @@ patches:
 
 ## Verifying deployment on localhost
 
-Port-forwarding Talkyard web service on localhost with unpriviliged port might result in a blank page. This is due to the $port being stripped from the request URL-header when requesting additional site assets. To temporarily fix this a minor modification can be done to the web pod: 
+Port-forwarding Talkyard web service on localhost with an unpriviliged port might result in a blank page. This is due to the $port being stripped from the request URL-header when requesting additional site assets. To temporarily fix this a minor modification can be done to the web pod: 
 
 ```shell
-kubectl exec web-546846b96d-f7vfq -- sed -i 's/proxy_set_header Host \$host/proxy_set_header Host \$http_host/' /etc/nginx/server-locations.conf
+kubectl exec web-546846b96d-f7vfq -- \
+  sed -i 's/proxy_set_header Host \$host/proxy_set_header Host \$http_host/' \
+  /etc/nginx/server-locations.conf
 
 kubectl exec web-546846b96d-f7vfq -- nginx -s reload
 ```
-
 Changing nginx parameter $host to $http_host has some security implications. A better and more permanent solution is to apply an ingress object infront of the web service configured with a proper URL.
-
-## Todo
-
-- add nodeselectors - **Done** - see example above
-- fix statefulset pvc - **Done** changed to deployment 
-- version script - **Done**
-- Check if easy way to demo with localhost port-forward - **Done**
-- Write up deployment with Tanka and kustomize - *In progress*
