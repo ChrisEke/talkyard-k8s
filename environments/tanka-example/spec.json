@@ -1,0 +1,13 @@
+{
+  "apiVersion": "tanka.dev/v1alpha1",
+  "kind": "Environment",
+  "metadata": {
+    "name": "environments/tanka-example"
+  },
+  "spec": {
+    "apiServer": "https://my-k8s-cluster:6443",
+    "namespace": "my-namespace",
+    "resourceDefaults": {},
+    "expectVersions": {}
+  }
+}

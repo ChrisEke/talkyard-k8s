@@ -51,10 +51,10 @@
     },
   },
   _images+:: {
-      app: 'debiki/talkyard-app',
-      rdb: 'debiki/talkyard-rdb',
-      cache: 'debiki/talkyard-cache',
-      search: 'debiki/talkyard-search',
-      web: 'debiki/talkyard-web',
-    },
+    app: 'debiki/talkyard-app',
+    rdb: 'debiki/talkyard-rdb',
+    cache: 'debiki/talkyard-cache',
+    search: 'debiki/talkyard-search',
+    web: 'debiki/talkyard-web',
+  },
 }

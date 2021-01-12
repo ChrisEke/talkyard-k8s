@@ -126,7 +126,7 @@
                                   'log4j2.properties': importstr 'files/log4j2.properties',
                                 }),
       envConfigMap: configMap.new(c.search.name + '-environment-vars')
-                    + configMap.withData(c.search.env),
+                    + configMap.withData({ 'bootstrap.memory_lock': 'true' } + c.search.env),
     },
     web: {
       deployment: deployment.new(
