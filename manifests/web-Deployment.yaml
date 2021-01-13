@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: webserver
+    app.kubernetes.io/part-of: talkyard
+    app.kubernetes.io/version: v0.2021.01-923ae76d3
+  name: web
+  namespace: talkyard
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: web
+  template:
+    metadata:
+      labels:
+        name: web
+    spec:
+      containers:
+      - image: debiki/talkyard-web:v0.2021.01-923ae76d3
+        imagePullPolicy: IfNotPresent
+        name: web
+        ports:
+        - containerPort: 80
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /-/ping-nginx
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5

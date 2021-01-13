@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: application
+    app.kubernetes.io/part-of: talkyard
+    app.kubernetes.io/version: v0.2021.01-923ae76d3
+  name: app
+  namespace: talkyard
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: app
+  template:
+    metadata:
+      labels:
+        name: app
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgres-password
+              name: talkyard-rdb-secrets
+        - name: PLAY_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: play-secret-key
+              name: talkyard-app-secrets
+        envFrom:
+        - configMapRef:
+            name: app-environment-vars
+        image: debiki/talkyard-app:v0.2021.01-923ae76d3
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          tcpSocket:
+            port: http
+          timeoutSeconds: 5
+        name: app
+        ports:
+        - containerPort: 9000
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /-/are-scripts-ready
+            port: http
+          initialDelaySeconds: 10
+        volumeMounts:
+        - mountPath: /opt/talkyard/app/conf/app-prod-override.conf
+          name: app-play-framework-conf
+          subPath: app-prod-override.conf
+      volumes:
+      - configMap:
+          name: app-play-framework-conf
+        name: app-play-framework-conf

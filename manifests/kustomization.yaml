@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- app-Deployment.yaml
+- app-environment-vars-ConfigMap.yaml
+- app-Service.yaml
+- cache-Deployment.yaml
+- cache-Service.yaml
+- rdb-Deployment.yaml
+- rdb-init-sh-override-ConfigMap.yaml
+- rdb-Service.yaml
+- search-Deployment.yaml
+- search-environment-vars-ConfigMap.yaml
+- search-log4j2-properties-override-ConfigMap.yaml
+- search-Service.yaml
+- talkyard-Namespace.yaml
+- web-Deployment.yaml
+- web-Service.yaml
