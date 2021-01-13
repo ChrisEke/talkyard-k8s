@@ -33,6 +33,7 @@ Two alternatives:
     jb install github.com/ChrisEke/talkyard-k8s/lib/talkyard
     ```
 2. Custom configuration of the Talkyard deployment should be done in directory `environments/default` (or whichever environment that is preferred).
+   
    **REQUIRED:** 
    - Talkyard-app expects configuration file [play-framework.conf](https://github.com/debiki/talkyard-prod-one/blob/master/conf/play-framework.conf) for custom configurations such as hostname, SMTP, user authentications etc. Place `play-framework.conf` in `environments/default` directory and update desired parameters.  
    - Update `main.jsonnet` to include play-framework.conf as a ConfigMap.
@@ -41,56 +42,56 @@ Two alternatives:
 
   Examples from [environments/tanka-example](https://github.com/ChrisEke/talkyard-k8s/tree/main/environments/tanka-example)
    
-  `environments/tanka-example/main.jsonnet`:
+  **environments/tanka-example/main.jsonnet:**
   
-    ```jsonnet
-    (import 'talkyard/talkyard.libsonnet')
+  ```jsonnet
+  (import 'talkyard/talkyard.libsonnet')
 
-    {
-      app+: {
-        // Includes play-framework.conf as a ConfigMap which Talkyard-app will mount as a config volume.
-        playFrameworkConfigMap: $.core.v1.configMap.new('app-play-framework-conf')
-                                + $.core.v1.configMap.withData({
-                                  'app-prod-override.conf': importstr 'play-framework.conf',
-                                }),
-      },
-      _config+:: {
-        namespace: 'my-namespace',
-        app+:: {
-          // Settings for Java heap size as well as many of the parameters in play-framework-conf
-          // can be specified as environment variables
-          env+:: {
-            PLAY_HEAP_MEMORY_MB: '256',
-            BECOME_OWNER_EMAIL_ADDRESS: 'example@example.com',
-            TALKYARD_HOSTNAME: 'example.com',
-          },
-        },
-        search+:: {
-          env+:: {
-            ES_JAVA_OPTS: '-Xms192m -Xmx192m',
-          },
+  {
+    app+: {
+      // Includes play-framework.conf as a ConfigMap which Talkyard-app will mount as a config volume.
+      playFrameworkConfigMap: $.core.v1.configMap.new('app-play-framework-conf')
+                              + $.core.v1.configMap.withData({
+                                'app-prod-override.conf': importstr 'play-framework.conf',
+                              }),
+    },
+    _config+:: {
+      namespace: 'my-namespace',
+      app+:: {
+        // Settings for Java heap size as well as many of the parameters in play-framework-conf
+        // can be specified as environment variables
+        env+:: {
+          PLAY_HEAP_MEMORY_MB: '256',
+          BECOME_OWNER_EMAIL_ADDRESS: 'example@example.com',
+          TALKYARD_HOSTNAME: 'example.com',
         },
       },
-    }
-    ```
-
-  `environments/tanka-example/spec.jsonnet`:
-
-    ```json
-    {
-      "apiVersion": "tanka.dev/v1alpha1",
-      "kind": "Environment",
-      "metadata": {
-        "name": "environments/tanka-example"
+      search+:: {
+        env+:: {
+          ES_JAVA_OPTS: '-Xms192m -Xmx192m',
+        },
       },
-      "spec": {
-        "apiServer": "https://my-k8s-cluster:6443",
-        "namespace": "my-namespace",
-        "resourceDefaults": {},
-        "expectVersions": {}
-      }
+    },
+  }
+  ```
+
+  **environments/tanka-example/spec.jsonnet:**
+
+  ```json
+  {
+    "apiVersion": "tanka.dev/v1alpha1",
+    "kind": "Environment",
+    "metadata": {
+      "name": "environments/tanka-example"
+    },
+    "spec": {
+      "apiServer": "https://my-k8s-cluster:6443",
+      "namespace": "my-namespace",
+      "resourceDefaults": {},
+      "expectVersions": {}
     }
-    ```
+  }
+  ```
 
 3. Apply to k8s cluster:
    
