@@ -40,58 +40,58 @@ Two alternatives:
    - Update `spec.json` with k8s cluster endpoint and namespace
    - By default namespace "talkyard" is created. This can be changed in `main.jsonnet`.
 
-  Examples from [environments/tanka-example](https://github.com/ChrisEke/talkyard-k8s/tree/main/environments/tanka-example)
+    Examples from [environments/tanka-example](https://github.com/ChrisEke/talkyard-k8s/tree/main/environments/tanka-example)
    
-  **environments/tanka-example/main.jsonnet:**
-  
-  ```jsonnet
-  (import 'talkyard/talkyard.libsonnet')
+    **environments/tanka-example/main.jsonnet:**
+    
+    ```jsonnet
+    (import 'talkyard/talkyard.libsonnet')
 
-  {
-    app+: {
-      // Includes play-framework.conf as a ConfigMap which Talkyard-app will mount as a config volume.
-      playFrameworkConfigMap: $.core.v1.configMap.new('app-play-framework-conf')
-                              + $.core.v1.configMap.withData({
-                                'app-prod-override.conf': importstr 'play-framework.conf',
-                              }),
-    },
-    _config+:: {
-      namespace: 'my-namespace',
-      app+:: {
-        // Settings for Java heap size as well as many of the parameters in play-framework-conf
-        // can be specified as environment variables
-        env+:: {
-          PLAY_HEAP_MEMORY_MB: '256',
-          BECOME_OWNER_EMAIL_ADDRESS: 'example@example.com',
-          TALKYARD_HOSTNAME: 'example.com',
+    {
+      app+: {
+        // Includes play-framework.conf as a ConfigMap which Talkyard-app will mount as a config volume.
+        playFrameworkConfigMap: $.core.v1.configMap.new('app-play-framework-conf')
+                                + $.core.v1.configMap.withData({
+                                  'app-prod-override.conf': importstr 'play-framework.conf',
+                                }),
+      },
+      _config+:: {
+        namespace: 'my-namespace',
+        app+:: {
+          // Settings for Java heap size as well as many of the parameters in play-framework-conf
+          // can be specified as environment variables
+          env+:: {
+            PLAY_HEAP_MEMORY_MB: '256',
+            BECOME_OWNER_EMAIL_ADDRESS: 'example@example.com',
+            TALKYARD_HOSTNAME: 'example.com',
+          },
+        },
+        search+:: {
+          env+:: {
+            ES_JAVA_OPTS: '-Xms192m -Xmx192m',
+          },
         },
       },
-      search+:: {
-        env+:: {
-          ES_JAVA_OPTS: '-Xms192m -Xmx192m',
-        },
-      },
-    },
-  }
-  ```
-
-  **environments/tanka-example/spec.jsonnet:**
-
-  ```json
-  {
-    "apiVersion": "tanka.dev/v1alpha1",
-    "kind": "Environment",
-    "metadata": {
-      "name": "environments/tanka-example"
-    },
-    "spec": {
-      "apiServer": "https://my-k8s-cluster:6443",
-      "namespace": "my-namespace",
-      "resourceDefaults": {},
-      "expectVersions": {}
     }
-  }
-  ```
+    ```
+
+    **environments/tanka-example/spec.jsonnet:**
+
+    ```json
+    {
+      "apiVersion": "tanka.dev/v1alpha1",
+      "kind": "Environment",
+      "metadata": {
+        "name": "environments/tanka-example"
+      },
+      "spec": {
+        "apiServer": "https://my-k8s-cluster:6443",
+        "namespace": "my-namespace",
+        "resourceDefaults": {},
+        "expectVersions": {}
+      }
+    }
+    ```
 
 3. Apply to k8s cluster:
    
