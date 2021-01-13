@@ -34,51 +34,58 @@ Two alternatives:
     ```
 2. Custom configuration of the Talkyard deployment should be done in directory `environments/default` (or whichever environment that is preferred).
    **REQUIRED:** 
-   - Talkyard-app expects configuration file `play-framework.conf` for custom configurations such as hostname, SMTP, user authentications etc. Place `play-framework.conf` in `environments/default` directory and update desired parameters.  
+   - Talkyard-app expects configuration file [play-framework.conf](https://github.com/debiki/talkyard-prod-one/blob/master/conf/play-framework.conf) for custom configurations such as hostname, SMTP, user authentications etc. Place `play-framework.conf` in `environments/default` directory and update desired parameters.  
    - Update `main.jsonnet` to include play-framework.conf as a ConfigMap.
    - Update `spec.json` with k8s cluster endpoint and namespace
-   - By default namespace "talkyard" is created. This can be changed in `main.jsonnet`
+   - By default namespace "talkyard" is created. This can be changed in `main.jsonnet`.
 
-  Examples from 
+  Examples from [environments/tanka-example](https://github.com/ChrisEke/talkyard-k8s/tree/main/environments/tanka-example)
    
-   *example environments/default/main.jsonnet:*
+  `environments/tanka-example/main.jsonnet`:
   
     ```jsonnet
     (import 'talkyard/talkyard.libsonnet')
 
     {
+      app+: {
+        // Includes play-framework.conf as a ConfigMap which Talkyard-app will mount as a config volume.
+        playFrameworkConfigMap: $.core.v1.configMap.new('app-play-framework-conf')
+                                + $.core.v1.configMap.withData({
+                                  'app-prod-override.conf': importstr 'play-framework.conf',
+                                }),
+      },
       _config+:: {
-        talkyard+:: {
-          namespace+:: {
-            name: 'talkyard',
+        namespace: 'my-namespace',
+        app+:: {
+          // Settings for Java heap size as well as many of the parameters in play-framework-conf
+          // can be specified as environment variables
+          env+:: {
+            PLAY_HEAP_MEMORY_MB: '256',
+            BECOME_OWNER_EMAIL_ADDRESS: 'example@example.com',
+            TALKYARD_HOSTNAME: 'example.com',
           },
-          app+:: {
-            env+:: {
-              PLAY_HEAP_MEMORY_MB: '256',
-            },
-          },
-          search+:: {
-            env+:: {
-              ES_JAVA_OPTS: '-Xms192m -Xmx192m',
-              'bootstrap.memory_lock': 'true',
-            },
+        },
+        search+:: {
+          env+:: {
+            ES_JAVA_OPTS: '-Xms192m -Xmx192m',
           },
         },
       },
     }
     ```
-    *example environments/default/spec.jsonnet:*
 
-    ```jsonnet
+  `environments/tanka-example/spec.jsonnet`:
+
+    ```json
     {
       "apiVersion": "tanka.dev/v1alpha1",
       "kind": "Environment",
       "metadata": {
-        "name": "environments/default"
+        "name": "environments/tanka-example"
       },
       "spec": {
         "apiServer": "https://my-k8s-cluster:6443",
-        "namespace": "talkyard",
+        "namespace": "my-namespace",
         "resourceDefaults": {},
         "expectVersions": {}
       }
@@ -114,7 +121,7 @@ Two alternatives:
     mkdir talkyard && cd talkyard
     ```
 
-2. Setup `kustomization.yaml`-file. secretGenerator for mandatory secrets has been included in example below.
+2. Setup `kustomization.yaml`-file. Example configMapGenerator and secretGenerator has been included for mandatory configuration and secrets.
    
     ```shell
     cat << EOF > kustomization.yaml
@@ -122,6 +129,11 @@ Two alternatives:
     kind: Kustomization
 
     namespace: talkyard
+    
+    configMapGenerator:
+    - name: app-play-framework-conf
+      files:
+      - app-prod-override.conf=play-framework.conf
 
     secretGenerator:
       - name: talkyard-app-secrets
@@ -136,7 +148,8 @@ Two alternatives:
     - github.com/ChrisEke/talkyard-k8s
     EOF
     ```
-3. Apply to k8s cluster.
+3. Include file [play-framework.conf](https://github.com/debiki/talkyard-prod-one/blob/master/conf/play-framework.conf) in the project directory and update parameters to desired values.  
+4. Apply to k8s cluster.
    
     ```shell
     kustomize build . | kubectl apply -f -
