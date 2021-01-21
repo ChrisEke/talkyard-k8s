@@ -30,7 +30,7 @@ Two alternatives:
     ```shell
     mkdir talkyard && cd talkyard
     tk init
-    jb install github.com/ChrisEke/talkyard-k8s/lib/talkyard
+    jb install github.com/ChrisEke/talkyard-k8s/lib/talkyard@main
     ```
 2. Custom configuration of the Talkyard deployment should be done in directory `environments/default` (or whichever environment that is preferred).
    
