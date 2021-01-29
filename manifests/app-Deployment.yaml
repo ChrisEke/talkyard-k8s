@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/component: application
     app.kubernetes.io/part-of: talkyard
-    app.kubernetes.io/version: v0.2021.01-923ae76d3
+    app.kubernetes.io/version: v0.2021.02-879ef3fe1
   name: app
   namespace: talkyard
 spec:
@@ -34,7 +34,7 @@ spec:
         envFrom:
         - configMapRef:
             name: app-environment-vars
-        image: debiki/talkyard-app:v0.2021.01-923ae76d3
+        image: debiki/talkyard-app:v0.2021.02-879ef3fe1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           initialDelaySeconds: 30
