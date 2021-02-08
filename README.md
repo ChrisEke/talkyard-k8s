@@ -13,7 +13,7 @@ Talkyard source repository: [github.com/debiki/talkyard](https://github.com/debi
 Two alternatives: 
 
 1. With [Tanka](https://tanka.dev) and leverage this repository as a jsonnet library.
-2. With [Kustomize](https://github.com/kubernetes-sigs/kustomize/) as a remote resource.
+2. With [Kustomize](https://github.com/kubernetes-sigs/kustomize/) as a remote resource. For a more detailed step-by-step guide **[view this blog post](https://www.ekervhen.xyz/posts/2021-02/talkyard-on-k8s/)**.
 
 ### 1. Tanka
 
