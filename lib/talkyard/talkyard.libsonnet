@@ -60,6 +60,7 @@
                       + container.withEnv([
                         container.envType.fromSecretRef('POSTGRES_PASSWORD', 'talkyard-rdb-secrets', 'postgres-password'),
                       ])
+                      + container.withArgs('--logging_collector=off')
                       + container.mixin.readinessProbe.exec.withCommand($._probe.rdb.readiness.execCommand)
                       + container.mixin.readinessProbe.withInitialDelaySeconds(10)
                       + container.mixin.readinessProbe.withTimeoutSeconds(6)
@@ -70,13 +71,8 @@
                       + container.mixin.livenessProbe.withTimeoutSeconds(6),
                     ],
                   )
-                  + deployment.mixin.metadata.withLabels(commonLabels + c.rdb.labels)
-                  + $.util.configMapVolumeMount(self.initShOverrideConfigMap, '/docker-entrypoint-initdb.d'),
+                  + deployment.mixin.metadata.withLabels(commonLabels + c.rdb.labels),
       service: $.util.serviceFor(self.deployment),
-      initShOverrideConfigMap: configMap.new(c.rdb.name + '-init-sh-override')
-                               + configMap.withData({
-                                 'init.sh': importstr 'files/init.sh',
-                               }),
     },
     cache: {
       deployment: deployment.new(

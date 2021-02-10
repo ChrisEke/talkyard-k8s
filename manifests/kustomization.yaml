@@ -7,7 +7,6 @@ resources:
 - cache-Deployment.yaml
 - cache-Service.yaml
 - rdb-Deployment.yaml
-- rdb-init-sh-override-ConfigMap.yaml
 - rdb-Service.yaml
 - search-Deployment.yaml
 - search-environment-vars-ConfigMap.yaml

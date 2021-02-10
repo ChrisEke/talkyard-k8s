@@ -16,13 +16,13 @@ spec:
       name: rdb
   template:
     metadata:
-      annotations:
-        rdb-init-sh-override-hash: 7c3cde4a1adfa2344a4bbab371fafcce
       labels:
         name: rdb
     spec:
       containers:
-      - env:
+      - args:
+        - --logging_collector=off
+        env:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -52,10 +52,3 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 30
           timeoutSeconds: 6
-        volumeMounts:
-        - mountPath: /docker-entrypoint-initdb.d
-          name: rdb-init-sh-override
-      volumes:
-      - configMap:
-          name: rdb-init-sh-override
-        name: rdb-init-sh-override
