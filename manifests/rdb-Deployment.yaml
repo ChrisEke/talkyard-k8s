@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/component: database
     app.kubernetes.io/part-of: talkyard
-    app.kubernetes.io/version: v0.2021.08-639ccf013
+    app.kubernetes.io/version: v0.2021.10-e846283fa
   name: rdb
   namespace: talkyard
 spec:
@@ -28,7 +28,7 @@ spec:
             secretKeyRef:
               key: postgres-password
               name: talkyard-rdb-secrets
-        image: debiki/talkyard-rdb:v0.2021.08-639ccf013
+        image: debiki/talkyard-rdb:v0.2021.10-e846283fa
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:

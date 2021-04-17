@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/component: webserver
     app.kubernetes.io/part-of: talkyard
-    app.kubernetes.io/version: v0.2021.08-639ccf013
+    app.kubernetes.io/version: v0.2021.10-e846283fa
   name: web
   namespace: talkyard
 spec:
@@ -20,7 +20,7 @@ spec:
         name: web
     spec:
       containers:
-      - image: debiki/talkyard-web:v0.2021.08-639ccf013
+      - image: debiki/talkyard-web:v0.2021.10-e846283fa
         imagePullPolicy: IfNotPresent
         name: web
         ports:
